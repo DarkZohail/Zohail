@@ -92,6 +92,53 @@ end
 local EnableRollback = createActionButton("Activate Rollback", 70)
 local RejoinButton = createActionButton("Rejoin Server", 140)
 
+-- Placeholder for player traits
+local playerTraits = {}
+
+-- Function to save current traits
+local function saveCurrentTraits()
+    playerTraits = {} -- Reset the table
+    for _, trait in pairs(LocalPlayer.Traits:GetChildren()) do
+        table.insert(playerTraits, {
+            Name = trait.Name,
+            Value = trait.Value
+        })
+    end
+end
+
+-- Function to restore traits
+local function restoreTraits()
+    for _, trait in pairs(playerTraits) do
+        -- Logic to restore the trait to the player
+        -- Assuming there is a method to set the trait back
+        LocalPlayer.Traits[trait.Name].Value = trait.Value
+    end
+end
+
+-- Rollback function
+local function traitReroll()
+    saveCurrentTraits() -- Save current traits
+
+    -- Logic for rerolling traits
+    local rerollSuccess = math.random() < 0.5 -- Placeholder for success chance
+
+    if rerollSuccess then
+        print("New trait obtained!") -- Replace with actual logic
+    else
+        print("Rollback in progress...")
+        LocalPlayer:Kick("Rejoining to rollback...") -- Kicking player to rejoin
+        wait(5) -- Allow time for the kick to process
+        TeleportService:Teleport(game.PlaceId) -- Teleport back to the server
+        wait(5) -- Allow time for teleportation to complete
+        restoreTraits() -- Restore traits after rejoining
+    end
+end
+
+-- UI button to trigger the rollback
+EnableRollback.MouseButton1Click:Connect(function()
+    traitReroll()
+end)
+
 -- Function to display categories
 RollbackButton.MouseButton1Click:Connect(function()
     RollbackFrame.Visible = true
@@ -99,17 +146,6 @@ end)
 
 AutoFarmButton.MouseButton1Click:Connect(function()
     -- Add AutoFarm functionalities here
-end)
-
--- Rollback functionality
-EnableRollback.MouseButton1Click:Connect(function()
-    print("Rollback activated!")
-    -- Placeholder for rollback functionality
-end)
-
-RejoinButton.MouseButton1Click:Connect(function()
-    print("Rejoining server...")
-    TeleportService:Teleport(game.PlaceId)
 end)
 
 -- Anti-AFK function
