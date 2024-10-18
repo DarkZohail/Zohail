@@ -5,19 +5,23 @@ local isMobile = UserInputService.TouchEnabled -- Checks if the device has touch
 -- Creating the user interface (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-local RerollButton = Instance.new("TextButton")
-local RejoinButton = Instance.new("TextButton")
 local ColorFrame = Instance.new("Frame")
 local BlackButton = Instance.new("TextButton")
 local GrayButton = Instance.new("TextButton")
 local Title = Instance.new("TextLabel")
 
+-- Creating "Rollback Trait" window
+local RollbackFrame = Instance.new("Frame")
+local RollbackTitle = Instance.new("TextLabel")
+local RerollButton = Instance.new("TextButton")
+local RejoinButton = Instance.new("TextButton")
+
 -- GUI settings (adaptive for mobile and PC)
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- MainFrame settings
-MainFrame.Size = UDim2.new(0, 300, 0, 250)
-MainFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
+-- MainFrame settings (for color selection)
+MainFrame.Size = UDim2.new(0, 300, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -150, 0.3, -75)
 MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 MainFrame.BorderSizePixel = 3
 MainFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
@@ -28,7 +32,7 @@ MainFrame.Draggable = true
 -- Title settings
 Title.Size = UDim2.new(0, 300, 0, 50)
 Title.Position = UDim2.new(0, 0, 0, 0)
-Title.Text = "Trait Reroll System"
+Title.Text = "UI Customization"
 Title.TextScaled = true
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
@@ -36,7 +40,7 @@ Title.Parent = MainFrame
 
 -- ColorFrame settings (color selection buttons)
 ColorFrame.Size = UDim2.new(0, 300, 0, 100)
-ColorFrame.Position = UDim2.new(0, 0, 0, 150)
+ColorFrame.Position = UDim2.new(0, 0, 0, 50)
 ColorFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 ColorFrame.BorderSizePixel = 2
 ColorFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
@@ -58,21 +62,40 @@ GrayButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 GrayButton.TextColor3 = Color3.new(1, 1, 1)
 GrayButton.Parent = ColorFrame
 
--- Button for Trait Reroll
+-- RollbackFrame settings (new window for Trait Reroll and Rejoin)
+RollbackFrame.Size = UDim2.new(0, 300, 0, 200)
+RollbackFrame.Position = UDim2.new(0.5, -150, 0.6, -100)
+RollbackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+RollbackFrame.BorderSizePixel = 3
+RollbackFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
+RollbackFrame.Parent = ScreenGui
+RollbackFrame.Active = true
+RollbackFrame.Draggable = true
+
+-- Rollback window title settings
+RollbackTitle.Size = UDim2.new(0, 300, 0, 50)
+RollbackTitle.Position = UDim2.new(0, 0, 0, 0)
+RollbackTitle.Text = "Rollback Trait"
+RollbackTitle.TextScaled = true
+RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
+RollbackTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+RollbackTitle.Parent = RollbackFrame
+
+-- Button for Trait Reroll in Rollback window
 RerollButton.Size = UDim2.new(0, 200, 0, 50)
 RerollButton.Position = UDim2.new(0.5, -100, 0, 60)
 RerollButton.Text = "Activate Trait Reroll"
 RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
 RerollButton.TextColor3 = Color3.new(1, 1, 1)
-RerollButton.Parent = MainFrame
+RerollButton.Parent = RollbackFrame
 
--- Button for Rejoin
+-- Button for Rejoin Server in Rollback window
 RejoinButton.Size = UDim2.new(0, 200, 0, 50)
 RejoinButton.Position = UDim2.new(0.5, -100, 0, 130)
 RejoinButton.Text = "Rejoin Server"
 RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
 RejoinButton.TextColor3 = Color3.new(1, 1, 1)
-RejoinButton.Parent = MainFrame
+RejoinButton.Parent = RollbackFrame
 
 -- Action when the Reroll Button is clicked
 RerollButton.MouseButton1Click:Connect(function()
