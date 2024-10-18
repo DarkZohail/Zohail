@@ -1,14 +1,17 @@
--- Services
+-- Services Roblox
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local RunService = game:GetService("RunService")
 
--- Variables
+-- Variables du joueur et de son personnage
 local player = Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
 local traits = {"Trait1", "Trait2", "Trait3", "Trait4", "Trait5"} -- Liste des traits possibles
-local playerResources = 10 -- Ressources que le joueur a pour reroll (à remplacer par le système réel)
+local playerResources = 10 -- Ressources que le joueur a pour reroll
 local currentTrait = "Trait1" -- Trait actuel du joueur
 local previousTrait = currentTrait -- Pour le rollback
+local isAutoFarming = false -- Etat pour savoir si le joueur est en mode combat automatique
+local rollbackEnabled = false -- Checkbox pour activer ou désactiver le rollback
 
 -- Fonction pour effectuer le reroll
 local function performReroll()
@@ -28,6 +31,11 @@ local function performReroll()
     
     print("Nouveau trait obtenu : " .. currentTrait)
     playerResources = playerResources - 1 -- Déduit une ressource pour le reroll
+
+    -- Si rollback est activé, on restaure le trait précédent si le joueur n'aime pas le nouveau
+    if rollbackEnabled then
+        rollback()
+    end
 end
 
 -- Fonction pour effectuer le rollback
@@ -40,36 +48,128 @@ local function rollback()
     end
 end
 
--- Interface utilisateur pour le reroll
-local ScreenGui = Instance.new("ScreenGui")
-local RerollButton = Instance.new("TextButton")
-local RollbackButton = Instance.new("TextButton")
+-- Fonction pour activer ou désactiver le combat automatique
+local function toggleAutoFarm()
+    isAutoFarming = not isAutoFarming
+    if isAutoFarming then
+        print("Combat automatique activé.")
+        -- Simule le gain de ressources via le combat automatique
+        RunService.Heartbeat:Connect(function()
+            if isAutoFarming then
+                wait(5) -- Gagne des ressources toutes les 5 secondes
+                playerResources = playerResources + 1
+                print("Ressources gagnées: " .. playerResources)
+            end
+        end)
+    else
+        print("Combat automatique désactivé.")
+    end
+end
 
+-- Interface utilisateur (GUI)
+local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Paramètres du bouton de reroll
+-- Grande frame principale
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+MainFrame.Parent = ScreenGui
+
+-- Titre de la frame principale
+local MainTitle = Instance.new("TextLabel")
+MainTitle.Size = UDim2.new(1, 0, 0, 50)
+MainTitle.Text = "Menu Principal"
+MainTitle.TextScaled = true
+MainTitle.TextColor3 = Color3.new(1, 1, 1)
+MainTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainTitle.Parent = MainFrame
+
+-- Frame pour Auto Farm
+local AutoFarmFrame = Instance.new("Frame")
+AutoFarmFrame.Size = UDim2.new(1, -20, 0, 100)
+AutoFarmFrame.Position = UDim2.new(0, 10, 0, 60)
+AutoFarmFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+AutoFarmFrame.Parent = MainFrame
+
+-- Titre pour la section Auto Farm
+local AutoFarmTitle = Instance.new("TextLabel")
+AutoFarmTitle.Size = UDim2.new(1, 0, 0, 30)
+AutoFarmTitle.Text = "Auto Farm"
+AutoFarmTitle.TextScaled = true
+AutoFarmTitle.TextColor3 = Color3.new(1, 1, 1)
+AutoFarmTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+AutoFarmTitle.Parent = AutoFarmFrame
+
+-- Bouton pour activer/désactiver Auto Farm
+local AutoFarmButton = Instance.new("TextButton")
+AutoFarmButton.Size = UDim2.new(0, 200, 0, 50)
+AutoFarmButton.Position = UDim2.new(0.5, -100, 0, 40)
+AutoFarmButton.Text = "Activer Auto Farm"
+AutoFarmButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
+AutoFarmButton.Parent = AutoFarmFrame
+
+-- Frame pour Trait Reroll
+local RerollFrame = Instance.new("Frame")
+RerollFrame.Size = UDim2.new(1, -20, 0, 130)
+RerollFrame.Position = UDim2.new(0, 10, 0, 170)
+RerollFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+RerollFrame.Parent = MainFrame
+
+-- Titre pour la section Trait Reroll
+local RerollTitle = Instance.new("TextLabel")
+RerollTitle.Size = UDim2.new(1, 0, 0, 30)
+RerollTitle.Text = "Trait Reroll"
+RerollTitle.TextScaled = true
+RerollTitle.TextColor3 = Color3.new(1, 1, 1)
+RerollTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+RerollTitle.Parent = RerollFrame
+
+-- Bouton pour effectuer le Reroll
+local RerollButton = Instance.new("TextButton")
 RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0.5, -100, 0.5, -25)
+RerollButton.Position = UDim2.new(0.5, -100, 0, 40)
 RerollButton.Text = "Effectuer Reroll"
 RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-RerollButton.Parent = ScreenGui
+RerollButton.Parent = RerollFrame
 
--- Paramètres du bouton de rollback
-RollbackButton.Size = UDim2.new(0, 200, 0, 50)
-RollbackButton.Position = UDim2.new(0.5, -100, 0.5, 30)
-RollbackButton.Text = "Rollback Trait"
-RollbackButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
-RollbackButton.Parent = ScreenGui
+-- Checkbox pour activer le rollback
+local RollbackCheckbox = Instance.new("TextButton")
+RollbackCheckbox.Size = UDim2.new(0, 20, 0, 20)
+RollbackCheckbox.Position = UDim2.new(0.5, -60, 0, 100)
+RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+RollbackCheckbox.Text = ""
+RollbackCheckbox.Parent = RerollFrame
 
--- Action lorsque le bouton de reroll est cliqué
+-- Label pour la checkbox de rollback
+local RollbackLabel = Instance.new("TextLabel")
+RollbackLabel.Size = UDim2.new(0, 160, 0, 20)
+RollbackLabel.Position = UDim2.new(0.5, -30, 0, 100)
+RollbackLabel.Text = "Activer Rollback"
+RollbackLabel.TextScaled = true
+RollbackLabel.TextColor3 = Color3.new(1, 1, 1)
+RollbackLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+RollbackLabel.Parent = RerollFrame
+
+-- Action lorsque le bouton Auto Farm est cliqué
+AutoFarmButton.MouseButton1Click:Connect(function()
+    toggleAutoFarm()
+    AutoFarmButton.Text = isAutoFarming and "Désactiver Auto Farm" or "Activer Auto Farm"
+end)
+
+-- Action lorsque le bouton Reroll est cliqué
 RerollButton.MouseButton1Click:Connect(function()
     performReroll()
 end)
 
--- Action lorsque le bouton de rollback est cliqué
-RollbackButton.MouseButton1Click:Connect(function()
-    rollback()
+-- Action pour cocher ou décocher la checkbox de rollback
+RollbackCheckbox.MouseButton1Click:Connect(function()
+    rollbackEnabled = not rollbackEnabled
+    RollbackCheckbox.BackgroundColor3 = rollbackEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 255, 255)
+    print("Rollback activé: ", rollbackEnabled)
 end)
 
--- Affiche le trait actuel
+-- Affiche le trait actuel au démarrage
 print("Trait actuel : " .. currentTrait)
+print("Ressources actuelles : " .. playerResources)
