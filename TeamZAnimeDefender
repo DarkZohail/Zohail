@@ -2,377 +2,161 @@
 local UserInputService = game:GetService("UserInputService")
 local isMobile = UserInputService.TouchEnabled -- Checks if the device has touch input
 
--- Services needed
-local TweenService = game:GetService("TweenService")
-
 -- Creating the user interface (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 local MainFrame = Instance.new("Frame")
-local MinimizedFrame = Instance.new("Frame")
-local TraitWindow = Instance.new("Frame")
-local CustomizationWindow = Instance.new("Frame")
-local MinimizeButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local CustomizeButton = Instance.new("TextButton")
+local ColorFrame = Instance.new("Frame")
+local BlackButton = Instance.new("TextButton")
+local GrayButton = Instance.new("TextButton")
+local Title = Instance.new("TextLabel")
 
--- Default colors
-local currentBackgroundColor = Color3.fromRGB(50, 50, 50)
-local currentBorderColor = Color3.fromRGB(255, 0, 0)
+-- Creating "Rollback Trait" window
+local RollbackFrame = Instance.new("Frame")
+local RollbackTitle = Instance.new("TextLabel")
+local RerollButton = Instance.new("TextButton")
+local RejoinButton = Instance.new("TextButton")
 
 -- GUI settings (adaptive for mobile and PC)
 ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Main Frame settings (holds multiple windows)
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = currentBackgroundColor
+-- MainFrame settings (for color selection)
+MainFrame.Size = UDim2.new(0, 300, 0, 150)
+MainFrame.Position = UDim2.new(0.5, -150, 0.3, -75)
+MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 MainFrame.BorderSizePixel = 3
-MainFrame.BorderColor3 = currentBorderColor
+MainFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Minimized Frame (when minimized)
-MinimizedFrame.Size = UDim2.new(0, 150, 0, 50)
-MinimizedFrame.Position = UDim2.new(0.5, -75, 0.5, -25)
-MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-MinimizedFrame.BorderSizePixel = 3
-MinimizedFrame.BorderColor3 = currentBorderColor
-MinimizedFrame.Parent = ScreenGui
-MinimizedFrame.Visible = false -- Hidden until minimized
-MinimizedFrame.Active = true
-MinimizedFrame.Draggable = true
+-- Title settings
+Title.Size = UDim2.new(0, 300, 0, 50)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "UI Customization"
+Title.TextScaled = true
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Title.Parent = MainFrame
 
--- Minimize Button settings
-MinimizeButton.Size = UDim2.new(0, 100, 0, 40)
-MinimizeButton.Position = UDim2.new(0, 10, 0, 10)
-MinimizeButton.Text = "Minimize"
-MinimizeButton.TextScaled = true
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
-MinimizeButton.Parent = MainFrame
+-- ColorFrame settings (color selection buttons)
+ColorFrame.Size = UDim2.new(0, 300, 0, 100)
+ColorFrame.Position = UDim2.new(0, 0, 0, 50)
+ColorFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+ColorFrame.BorderSizePixel = 2
+ColorFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
+ColorFrame.Parent = MainFrame
 
--- Close Button settings
-CloseButton.Size = UDim2.new(0, 100, 0, 40)
-CloseButton.Position = UDim2.new(0, 120, 0, 10)
-CloseButton.Text = "Close"
-CloseButton.TextScaled = true
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-CloseButton.Parent = MainFrame
-
--- Customize Button settings
-CustomizeButton.Size = UDim2.new(0, 100, 0, 40)
-CustomizeButton.Position = UDim2.new(0, 230, 0, 10)
-CustomizeButton.Text = "Customize"
-CustomizeButton.TextScaled = true
-CustomizeButton.TextColor3 = Color3.new(1, 1, 1)
-CustomizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
-CustomizeButton.Parent = MainFrame
-
--- TraitWindow settings (inside MainFrame)
-TraitWindow.Size = UDim2.new(0, 380, 0, 220)
-TraitWindow.Position = UDim2.new(0, 10, 0, 60)
-TraitWindow.BackgroundColor3 = currentBackgroundColor
-TraitWindow.BorderSizePixel = 2
-TraitWindow.BorderColor3 = currentBorderColor
-TraitWindow.Parent = MainFrame
-
--- Customization Window settings
-CustomizationWindow.Size = UDim2.new(0, 380, 0, 220)
-CustomizationWindow.Position = UDim2.new(0, 10, 0, 60)
-CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-CustomizationWindow.BorderSizePixel = 2
-CustomizationWindow.BorderColor3 = currentBorderColor
-CustomizationWindow.Parent = MainFrame
-CustomizationWindow.Visible = false -- Hidden until customize button is clicked
-
--- Color picker buttons inside CustomizationWindow
-local BlackButton = Instance.new("TextButton")
-local GrayButton = Instance.new("TextButton")
-
-BlackButton.Size = UDim2.new(0, 150, 0, 50)
-BlackButton.Position = UDim2.new(0, 20, 0, 50)
-BlackButton.Text = "Black Theme"
-BlackButton.TextColor3 = Color3.new(1, 1, 1)
+-- Button for Black background
+BlackButton.Size = UDim2.new(0, 120, 0, 50)
+BlackButton.Position = UDim2.new(0, 20, 0, 25)
+BlackButton.Text = "Black Background"
 BlackButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BlackButton.Parent = CustomizationWindow
+BlackButton.TextColor3 = Color3.new(1, 1, 1)
+BlackButton.Parent = ColorFrame
 
-GrayButton.Size = UDim2.new(0, 150, 0, 50)
-GrayButton.Position = UDim2.new(0, 200, 0, 50)
-GrayButton.Text = "Gray Theme"
+-- Button for Gray background
+GrayButton.Size = UDim2.new(0, 120, 0, 50)
+GrayButton.Position = UDim2.new(0, 160, 0, 25)
+GrayButton.Text = "Gray Background"
+GrayButton.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
 GrayButton.TextColor3 = Color3.new(1, 1, 1)
-GrayButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
-GrayButton.Parent = CustomizationWindow
+GrayButton.Parent = ColorFrame
 
--- Function to apply the color change
-local function updateColors(newBackgroundColor, newBorderColor)
-    currentBackgroundColor = newBackgroundColor
-    currentBorderColor = newBorderColor
+-- RollbackFrame settings (new window for Trait Reroll and Rejoin)
+RollbackFrame.Size = UDim2.new(0, 300, 0, 200)
+RollbackFrame.Position = UDim2.new(0.5, -150, 0.6, -100)
+RollbackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+RollbackFrame.BorderSizePixel = 3
+RollbackFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Red borders
+RollbackFrame.Parent = ScreenGui
+RollbackFrame.Active = true
+RollbackFrame.Draggable = true
 
-    -- Update MainFrame and subframes
-    MainFrame.BackgroundColor3 = currentBackgroundColor
-    MainFrame.BorderColor3 = currentBorderColor
-    MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-    MinimizedFrame.BorderColor3 = currentBorderColor
-    TraitWindow.BackgroundColor3 = currentBackgroundColor
-    TraitWindow.BorderColor3 = currentBorderColor
-    CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-    CustomizationWindow.BorderColor3 = currentBorderColor
-end
+-- Rollback window title settings
+RollbackTitle.Size = UDim2.new(0, 300, 0, 50)
+RollbackTitle.Position = UDim2.new(0, 0, 0, 0)
+RollbackTitle.Text = "Rollback Trait"
+RollbackTitle.TextScaled = true
+RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
+RollbackTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+RollbackTitle.Parent = RollbackFrame
 
--- Apply color change on button clicks
-BlackButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 0, 0)) -- Black theme with red borders
-end)
-
-GrayButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(128, 128, 128), Color3.fromRGB(255, 0, 0)) -- Gray theme with red borders
-end)
-
--- Toggle visibility of the customization window
-CustomizeButton.MouseButton1Click:Connect(function()
-    CustomizationWindow.Visible = not CustomizationWindow.Visible
-end)
-
--- Minimize action
-MinimizeButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    MinimizedFrame.Visible = true
-end)
-
--- Maximize action (when clicking on the minimized frame)
-MinimizedFrame.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    MinimizedFrame.Visible = false
-end)
-
--- Close action
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy() -- Completely closes the script
-end)
-
--- Trait Reroll and Rejoin Server buttons inside Trait Window
-local RerollButton = Instance.new("TextButton")
-local RejoinButton = Instance.new("TextButton")
-
+-- Button for Trait Reroll in Rollback window
 RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0.5, -100, 0, 30)
+RerollButton.Position = UDim2.new(0.5, -100, 0, 60)
 RerollButton.Text = "Activate Trait Reroll"
 RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
 RerollButton.TextColor3 = Color3.new(1, 1, 1)
-RerollButton.Parent = TraitWindow
+RerollButton.Parent = RollbackFrame
 
+-- Button for Rejoin Server in Rollback window
 RejoinButton.Size = UDim2.new(0, 200, 0, 50)
-RejoinButton.Position = UDim2.new(0.5, -100, 0, 100)
+RejoinButton.Position = UDim2.new(0.5, -100, 0, 130)
 RejoinButton.Text = "Rejoin Server"
 RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
 RejoinButton.TextColor3 = Color3.new(1, 1, 1)
-RejoinButton.Parent = TraitWindow
-
--- Action when the Reroll Button is clicked
-RerollButton.MouseButton1Click:Connect(function()
-    print("Trait Reroll activated!")
-    traitReroll()
-end)
+RejoinButton.Parent = RollbackFrame
 
 -- Action when the Rejoin Button is clicked
 RejoinButton.MouseButton1Click:Connect(function()
     print("Rejoining Server...")
+    -- Use the function to rejoin a new server
     game:GetService("TeleportService"):Teleport(game.PlaceId)
 end)
 
--- Function for Trait Reroll (rollback included)
-function traitHere’s an updated script for both **mobile and PC** that incorporates:
-
-1. A **minimizable window** that stays visible (in collapsed form) when minimized.
-2. A **UI customization window** that allows changing the theme color dynamically.
-3. A main **"Rollback Trait" window** with buttons for Trait Reroll and Rejoining the server.
-4. A **close button** that fully shuts down the script.
-
-```lua
--- Detecting device type (mobile or PC)
-local UserInputService = game:GetService("UserInputService")
-local isMobile = UserInputService.TouchEnabled -- Checks if the device has touch input
-
--- Services needed
-local TweenService = game:GetService("TweenService")
-
--- Creating the user interface (GUI)
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local MinimizedFrame = Instance.new("Frame")
-local TraitWindow = Instance.new("Frame")
-local CustomizationWindow = Instance.new("Frame")
-local MinimizeButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local CustomizeButton = Instance.new("TextButton")
-
--- Default colors
-local currentBackgroundColor = Color3.fromRGB(50, 50, 50)
-local currentBorderColor = Color3.fromRGB(255, 0, 0)
-
--- GUI settings (adaptive for mobile and PC)
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
--- Main Frame settings (holds multiple windows)
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = currentBackgroundColor
-MainFrame.BorderSizePixel = 3
-MainFrame.BorderColor3 = currentBorderColor
-MainFrame.Parent = ScreenGui
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- Minimized Frame (when minimized)
-MinimizedFrame.Size = UDim2.new(0, 150, 0, 50)
-MinimizedFrame.Position = UDim2.new(0.5, -75, 0.5, -25)
-MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-MinimizedFrame.BorderSizePixel = 3
-MinimizedFrame.BorderColor3 = currentBorderColor
-MinimizedFrame.Parent = ScreenGui
-MinimizedFrame.Visible = false -- Hidden until minimized
-MinimizedFrame.Active = true
-MinimizedFrame.Draggable = true
-
--- Minimize Button settings
-MinimizeButton.Size = UDim2.new(0, 100, 0, 40)
-MinimizeButton.Position = UDim2.new(0, 10, 0, 10)
-MinimizeButton.Text = "Minimize"
-MinimizeButton.TextScaled = true
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
-MinimizeButton.Parent = MainFrame
-
--- Close Button settings
-CloseButton.Size = UDim2.new(0, 100, 0, 40)
-CloseButton.Position = UDim2.new(0, 120, 0, 10)
-CloseButton.Text = "Close"
-CloseButton.TextScaled = true
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-CloseButton.Parent = MainFrame
-
--- Customize Button settings
-CustomizeButton.Size = UDim2.new(0, 100, 0, 40)
-CustomizeButton.Position = UDim2.new(0, 230, 0, 10)
-CustomizeButton.Text = "Customize"
-CustomizeButton.TextScaled = true
-CustomizeButton.TextColor3 = Color3.new(1, 1, 1)
-CustomizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
-CustomizeButton.Parent = MainFrame
-
--- TraitWindow settings (inside MainFrame)
-TraitWindow.Size = UDim2.new(0, 380, 0, 220)
-TraitWindow.Position = UDim2.new(0, 10, 0, 60)
-TraitWindow.BackgroundColor3 = currentBackgroundColor
-TraitWindow.BorderSizePixel = 2
-TraitWindow.BorderColor3 = currentBorderColor
-TraitWindow.Parent = MainFrame
-
--- Customization Window settings
-CustomizationWindow.Size = UDim2.new(0, 380, 0, 220)
-CustomizationWindow.Position = UDim2.new(0, 10, 0, 60)
-CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-CustomizationWindow.BorderSizePixel = 2
-CustomizationWindow.BorderColor3 = currentBorderColor
-CustomizationWindow.Parent = MainFrame
-CustomizationWindow.Visible = false -- Hidden until customize button is clicked
-
--- Color picker buttons inside CustomizationWindow
-local BlackButton = Instance.new("TextButton")
-local GrayButton = Instance.new("TextButton")
-
-BlackButton.Size = UDim2.new(0, 150, 0, 50)
-BlackButton.Position = UDim2.new(0, 20, 0, 50)
-BlackButton.Text = "Black Theme"
-BlackButton.TextColor3 = Color3.new(1, 1, 1)
-BlackButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BlackButton.Parent = CustomizationWindow
-
-GrayButton.Size = UDim2.new(0, 150, 0, 50)
-GrayButton.Position = UDim2.new(0, 200, 0, 50)
-GrayButton.Text = "Gray Theme"
-GrayButton.TextColor3 = Color3.new(1, 1, 1)
-GrayButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
-GrayButton.Parent = CustomizationWindow
-
--- Function to apply the color change
-local function updateColors(newBackgroundColor, newBorderColor)
-    currentBackgroundColor = newBackgroundColor
-    currentBorderColor = newBorderColor
-
-    -- Update MainFrame and subframes
-    MainFrame.BackgroundColor3 = currentBackgroundColor
-    MainFrame.BorderColor3 = currentBorderColor
-    MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-    MinimizedFrame.BorderColor3 = currentBorderColor
-    TraitWindow.BackgroundColor3 = currentBackgroundColor
-    TraitWindow.BorderColor3 = currentBorderColor
-    CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-    CustomizationWindow.BorderColor3 = currentBorderColor
-end
-
--- Apply color change on button clicks
+-- Change background to black
 BlackButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 0, 0)) -- Black theme with red borders
+    MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    print("Background changed to black.")
 end)
 
+-- Change background to gray
 GrayButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(128, 128, 128), Color3.fromRGB(255, 0, 0)) -- Gray theme with red borders
+    MainFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    print("Background changed to gray.")
 end)
 
--- Toggle visibility of the customization window
-CustomizeButton.MouseButton1Click:Connect(function()
-    CustomizationWindow.Visible = not CustomizationWindow.Visible
-end)
+-- Function to confirm Reroll
+local function confirmReroll()
+    local confirmationFrame = Instance.new("Frame")
+    confirmationFrame.Size = UDim2.new(0, 250, 0, 150)
+    confirmationFrame.Position = UDim2.new(0.5, -125, 0.5, -75)
+    confirmationFrame.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    confirmationFrame.Parent = ScreenGui
 
--- Minimize action
-MinimizeButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    MinimizedFrame.Visible = true
-end)
+    local confirmLabel = Instance.new("TextLabel")
+    confirmLabel.Size = UDim2.new(1, 0, 0.5, 0)
+    confirmLabel.Text = "Are you sure you want to reroll the trait?"
+    confirmLabel.TextScaled = true
+    confirmLabel.Parent = confirmationFrame
 
--- Maximize action (when clicking on the minimized frame)
-MinimizedFrame.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    MinimizedFrame.Visible = false
-end)
+    local yesButton = Instance.new("TextButton")
+    yesButton.Size = UDim2.new(0.5, 0, 0.5, 0)
+    yesButton.Position = UDim2.new(0, 0, 0.5, 0)
+    yesButton.Text = "Yes"
+    yesButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+    yesButton.Parent = confirmationFrame
 
--- Close action
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy() -- Completely closes the script
-end)
+    local noButton = Instance.new("TextButton")
+    noButton.Size = UDim2.new(0.5, 0, 0.5, 0)
+    noButton.Position = UDim2.new(0.5, 0, 0.5, 0)
+    noButton.Text = "No"
+    noButton.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+    noButton.Parent = confirmationFrame
 
--- Trait Reroll and Rejoin Server buttons inside Trait Window
-local RerollButton = Instance.new("TextButton")
-local RejoinButton = Instance.new("TextButton")
+    yesButton.MouseButton1Click:Connect(function()
+        traitReroll()
+        confirmationFrame:Destroy() -- Remove confirmation frame after confirmation
+    end)
 
-RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0.5, -100, 0, 30)
-RerollButton.Text = "Activate Trait Reroll"
-RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-RerollButton.TextColor3 = Color3.new(1, 1, 1)
-RerollButton.Parent = TraitWindow
-
-RejoinButton.Size = UDim2.new(0, 200, 0, 50)
-RejoinButton.Position = UDim2.new(0.5, -100, 0, 100)
-RejoinButton.Text = "Rejoin Server"
-RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
-RejoinButton.TextColor3 = Color3.new(1, 1, 1)
-RejoinButton.Parent = TraitWindow
+    noButton.MouseButton1Click:Connect(function()
+        confirmationFrame:Destroy() -- Remove confirmation frame on cancellation
+    end)
+end
 
 -- Action when the Reroll Button is clicked
 RerollButton.MouseButton1Click:Connect(function()
-    print("Trait Reroll activated!")
-    traitReroll()
-end)
-
--- Action when the Rejoin Button is clicked
-RejoinButton.MouseButton1Click:Connect(function()
-    print("Rejoining Server...")
-    game:GetService("TeleportService"):Teleport(game.PlaceId)
+    confirmReroll() -- Show confirmation dialog
 end)
 
 -- Function for Trait Reroll (rollback included)
@@ -384,211 +168,25 @@ function traitReroll()
 
     -- Loop for reroll
     while not passiveObtained and traitRerollsUsed < 5 do
-        -- Simulating a trait rerHere is the updated script following your request for better window management, color customization, and a minimized view that keeps the script visible:
+        -- Simulating a trait reroll
+        traitRerollsUsed = traitRerollsUsed + 1
+        passiveObtained = (math.random(1, 10) == 1) -- 1 in 10 chance
+        wait(2)
+    end
 
-### Script Summary:
-1. **Main Frame**: Holds all elements and includes minimize, close, and customization buttons.
-2. **Minimized Frame**: Appears when the main window is minimized, but remains visible.
-3. **Customization Window**: Allows dynamic color theme changes.
-4. **Buttons for Rejoining the server** and **activating Trait Reroll** in the main frame.
-5. **Close and Minimize** buttons that behave as required.
+    -- If the passive is not obtained, kick and rollback
+    if not passiveObtained then
+        local rerollsBeforeRejoin = traitRerollsUsed
+        player:Kick("Rejoining a new server to rollback...")
 
-```lua
--- Detecting device type (mobile or PC)
-local UserInputService = game:GetService("UserInputService")
-local isMobile = UserInputService.TouchEnabled -- Checks if the device has touch input
+        -- Rejoin a new server
+        wait(5)
+        game:GetService("TeleportService"):Teleport(game.PlaceId)
 
--- Services needed
-local TweenService = game:GetService("TweenService")
-
--- Creating the user interface (GUI)
-local ScreenGui = Instance.new("ScreenGui")
-local MainFrame = Instance.new("Frame")
-local MinimizedFrame = Instance.new("Frame")
-local TraitWindow = Instance.new("Frame")
-local CustomizationWindow = Instance.new("Frame")
-local MinimizeButton = Instance.new("TextButton")
-local CloseButton = Instance.new("TextButton")
-local CustomizeButton = Instance.new("TextButton")
-
--- Default colors
-local currentBackgroundColor = Color3.fromRGB(50, 50, 50)
-local currentBorderColor = Color3.fromRGB(255, 0, 0)
-
--- GUI settings (adaptive for mobile and PC)
-ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
-
--- Main Frame settings (holds multiple windows)
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
-MainFrame.BackgroundColor3 = currentBackgroundColor
-MainFrame.BorderSizePixel = 3
-MainFrame.BorderColor3 = currentBorderColor
-MainFrame.Parent = ScreenGui
-MainFrame.Active = true
-MainFrame.Draggable = true
-
--- Minimized Frame (when minimized)
-MinimizedFrame.Size = UDim2.new(0, 150, 0, 50)
-MinimizedFrame.Position = UDim2.new(0.5, -75, 0.5, -25)
-MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-MinimizedFrame.BorderSizePixel = 3
-MinimizedFrame.BorderColor3 = currentBorderColor
-MinimizedFrame.Parent = ScreenGui
-MinimizedFrame.Visible = false -- Hidden until minimized
-MinimizedFrame.Active = true
-MinimizedFrame.Draggable = true
-
--- Minimize Button settings
-MinimizeButton.Size = UDim2.new(0, 100, 0, 40)
-MinimizeButton.Position = UDim2.new(0, 10, 0, 10)
-MinimizeButton.Text = "Minimize"
-MinimizeButton.TextScaled = true
-MinimizeButton.TextColor3 = Color3.new(1, 1, 1)
-MinimizeButton.BackgroundColor3 = Color3.fromRGB(85, 85, 85)
-MinimizeButton.Parent = MainFrame
-
--- Close Button settings
-CloseButton.Size = UDim2.new(0, 100, 0, 40)
-CloseButton.Position = UDim2.new(0, 120, 0, 10)
-CloseButton.Text = "Close"
-CloseButton.TextScaled = true
-CloseButton.TextColor3 = Color3.new(1, 1, 1)
-CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-CloseButton.Parent = MainFrame
-
--- Customize Button settings
-CustomizeButton.Size = UDim2.new(0, 100, 0, 40)
-CustomizeButton.Position = UDim2.new(0, 230, 0, 10)
-CustomizeButton.Text = "Customize"
-CustomizeButton.TextScaled = true
-CustomizeButton.TextColor3 = Color3.new(1, 1, 1)
-CustomizeButton.BackgroundColor3 = Color3.fromRGB(100, 100, 255)
-CustomizeButton.Parent = MainFrame
-
--- TraitWindow settings (inside MainFrame)
-TraitWindow.Size = UDim2.new(0, 380, 0, 220)
-TraitWindow.Position = UDim2.new(0, 10, 0, 60)
-TraitWindow.BackgroundColor3 = currentBackgroundColor
-TraitWindow.BorderSizePixel = 2
-TraitWindow.BorderColor3 = currentBorderColor
-TraitWindow.Parent = MainFrame
-
--- Customization Window settings
-CustomizationWindow.Size = UDim2.new(0, 380, 0, 220)
-CustomizationWindow.Position = UDim2.new(0, 10, 0, 60)
-CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-CustomizationWindow.BorderSizePixel = 2
-CustomizationWindow.BorderColor3 = currentBorderColor
-CustomizationWindow.Parent = MainFrame
-CustomizationWindow.Visible = false -- Hidden until customize button is clicked
-
--- Color picker buttons inside CustomizationWindow
-local BlackButton = Instance.new("TextButton")
-local GrayButton = Instance.new("TextButton")
-
-BlackButton.Size = UDim2.new(0, 150, 0, 50)
-BlackButton.Position = UDim2.new(0, 20, 0, 50)
-BlackButton.Text = "Black Theme"
-BlackButton.TextColor3 = Color3.new(1, 1, 1)
-BlackButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-BlackButton.Parent = CustomizationWindow
-
-GrayButton.Size = UDim2.new(0, 150, 0, 50)
-GrayButton.Position = UDim2.new(0, 200, 0, 50)
-GrayButton.Text = "Gray Theme"
-GrayButton.TextColor3 = Color3.new(1, 1, 1)
-GrayButton.BackgroundColor3 = Color3.fromRGB(128, 128, 128)
-GrayButton.Parent = CustomizationWindow
-
--- Function to apply the color change
-local function updateColors(newBackgroundColor, newBorderColor)
-    currentBackgroundColor = newBackgroundColor
-    currentBorderColor = newBorderColor
-
-    -- Update MainFrame and subframes
-    MainFrame.BackgroundColor3 = currentBackgroundColor
-    MainFrame.BorderColor3 = currentBorderColor
-    MinimizedFrame.BackgroundColor3 = currentBackgroundColor
-    MinimizedFrame.BorderColor3 = currentBorderColor
-    TraitWindow.BackgroundColor3 = currentBackgroundColor
-    TraitWindow.BorderColor3 = currentBorderColor
-    CustomizationWindow.BackgroundColor3 = currentBackgroundColor
-    CustomizationWindow.BorderColor3 = currentBorderColor
+        -- Restore rerolls after rejoining the new server
+        traitRerollsUsed = rerollsBeforeRejoin
+        print("Rerolls restored: " .. rerollsBeforeRejoin)
+    else
+        print("Desired passive obtained!")
+    end
 end
-
--- Apply color change on button clicks
-BlackButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(0, 0, 0), Color3.fromRGB(255, 0, 0)) -- Black theme with red borders
-end)
-
-GrayButton.MouseButton1Click:Connect(function()
-    updateColors(Color3.fromRGB(128, 128, 128), Color3.fromRGB(255, 0, 0)) -- Gray theme with red borders
-end)
-
--- Toggle visibility of the customization window
-CustomizeButton.MouseButton1Click:Connect(function()
-    CustomizationWindow.Visible = not CustomizationWindow.Visible
-end)
-
--- Minimize action
-MinimizeButton.MouseButton1Click:Connect(function()
-    MainFrame.Visible = false
-    MinimizedFrame.Visible = true
-end)
-
--- Maximize action (when clicking on the minimized frame)
-MinimizedFrame.MouseButton1Click:Connect(function()
-    MainFrame.Visible = true
-    MinimizedFrame.Visible = false
-end)
-
--- Close action
-CloseButton.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy() -- Completely closes the script
-end)
-
--- Trait Reroll and Rejoin Server buttons inside Trait Window
-local RerollButton = Instance.new("TextButton")
-local RejoinButton = Instance.new("TextButton")
-
-RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0.5, -100, 0, 30)
-RerollButton.Text = "Activate Trait Reroll"
-RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-RerollButton.TextColor3 = Color3.new(1, 1, 1)
-RerollButton.Parent = TraitWindow
-
-RejoinButton.Size = UDim2.new(0, 200, 0, 50)
-RejoinButton.Position = UDim2.new(0.5, -100, 0, 100)
-RejoinButton.Text = "Rejoin Server"
-RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
-RejoinButton.TextColor3 = Color3.new(1, 1, 1)
-RejoinButton.Parent = TraitWindow
-
--- Action when the Reroll Button is clicked
-RerollButton.MouseButton1Click:Connect(function()
-    print("Trait Reroll activated!")
-    traitReroll()
-end)
-
--- Action when the Rejoin Button is clicked
-RejoinButton.MouseButton1Click:Connect(function()
-    print("Rejoining Server...")
-    game:GetService("TeleportService"):Teleport(game.PlaceId)
-end)
-
--- Function for Trait Reroll (rollback included)
-function traitReroll()
-    local Players = game:GetService("Players")
-    local player = Players.LocalPlayer
-    local traitRerollsUsed = 0 -- Simulating used rerolls
-    local passiveObtained = false -- Simulating if the desired passive isI see that your script for creating a customizable UI in Roblox is nearly complete! Here’s a quick recap and adjustments:
-
-### Key Features:
-1. **Minimization Function**: The window minimizes but stays on screen, so it can be reopened.
-2. **Color Customization**: You can now dynamically switch the background and border colors of all UI components through the "Customize" button.
-3. **Main Functionality**: Includes buttons for rerolling traits and rejoining the server.
-4. **Close Functionality**: The "Close" button completely closes the UI.
-
-If you have any specific concerns with how these features work, let me know, and I can guide further adjustments!
