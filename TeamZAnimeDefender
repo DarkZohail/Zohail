@@ -2,6 +2,7 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local RunService = game:GetService("RunService")
+local VirtualUser = game:GetService("VirtualUser") -- Utilisé pour simuler l'activité du joueur
 
 -- Variables du joueur et de son personnage
 local player = Players.LocalPlayer
@@ -12,6 +13,7 @@ local currentTrait = "Trait1" -- Trait actuel du joueur
 local previousTrait = currentTrait -- Pour le rollback
 local isAutoFarming = false -- Etat pour savoir si le joueur est en mode combat automatique
 local rollbackEnabled = false -- Checkbox pour activer ou désactiver le rollback
+local antiAfkEnabled = true -- Etat pour activer/désactiver l'anti-AFK
 
 -- Fonction pour effectuer le reroll
 local function performReroll()
@@ -66,110 +68,100 @@ local function toggleAutoFarm()
     end
 end
 
+-- Fonction pour rejoindre un nouveau serveur
+local function rejoinServer()
+    print("Rejoining server...")
+    TeleportService:Teleport(game.PlaceId) -- Téléporte vers un nouveau serveur avec le même PlaceId
+end
+
+-- Fonction Anti-AFK
+local function antiAfk()
+    if antiAfkEnabled then
+        player.Idled:Connect(function()
+            VirtualUser:CaptureController()
+            VirtualUser:ClickButton2(Vector2.new()) -- Simule un clic droit pour éviter l'inactivité
+            print("Anti-AFK déclenché.")
+        end)
+    end
+end
+
 -- Interface utilisateur (GUI)
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = player:WaitForChild("PlayerGui")
 
 -- Grande frame principale
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 300)
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -150)
+MainFrame.Size = UDim2.new(0, 400, 0, 400) -- Agrandi pour inclure la nouvelle section
+MainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
 MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+MainFrame.BorderSizePixel = 3
+MainFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Bordures rouges
 MainFrame.Parent = ScreenGui
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- Titre de la frame principale
-local MainTitle = Instance.new("TextLabel")
-MainTitle.Size = UDim2.new(1, 0, 0, 50)
-MainTitle.Text = "Menu Principal"
-MainTitle.TextScaled = true
-MainTitle.TextColor3 = Color3.new(1, 1, 1)
-MainTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainTitle.Parent = MainFrame
+-- Titre
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(0, 400, 0, 50)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "Game Menu"
+Title.TextScaled = true
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+Title.Parent = MainFrame
 
--- Frame pour Auto Farm
-local AutoFarmFrame = Instance.new("Frame")
-AutoFarmFrame.Size = UDim2.new(1, -20, 0, 100)
-AutoFarmFrame.Position = UDim2.new(0, 10, 0, 60)
-AutoFarmFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-AutoFarmFrame.Parent = MainFrame
-
--- Titre pour la section Auto Farm
-local AutoFarmTitle = Instance.new("TextLabel")
-AutoFarmTitle.Size = UDim2.new(1, 0, 0, 30)
-AutoFarmTitle.Text = "Auto Farm"
-AutoFarmTitle.TextScaled = true
-AutoFarmTitle.TextColor3 = Color3.new(1, 1, 1)
-AutoFarmTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-AutoFarmTitle.Parent = AutoFarmFrame
-
--- Bouton pour activer/désactiver Auto Farm
+-- Section pour activer Auto Farm
 local AutoFarmButton = Instance.new("TextButton")
 AutoFarmButton.Size = UDim2.new(0, 200, 0, 50)
-AutoFarmButton.Position = UDim2.new(0.5, -100, 0, 40)
-AutoFarmButton.Text = "Activer Auto Farm"
-AutoFarmButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
-AutoFarmButton.Parent = AutoFarmFrame
+AutoFarmButton.Position = UDim2.new(0, 100, 0, 60)
+AutoFarmButton.Text = "Toggle Auto Farm"
+AutoFarmButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+AutoFarmButton.TextColor3 = Color3.new(1, 1, 1)
+AutoFarmButton.Parent = MainFrame
 
--- Frame pour Trait Reroll
-local RerollFrame = Instance.new("Frame")
-RerollFrame.Size = UDim2.new(1, -20, 0, 130)
-RerollFrame.Position = UDim2.new(0, 10, 0, 170)
-RerollFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-RerollFrame.Parent = MainFrame
+AutoFarmButton.MouseButton1Click:Connect(toggleAutoFarm)
 
--- Titre pour la section Trait Reroll
-local RerollTitle = Instance.new("TextLabel")
-RerollTitle.Size = UDim2.new(1, 0, 0, 30)
-RerollTitle.Text = "Trait Reroll"
-RerollTitle.TextScaled = true
-RerollTitle.TextColor3 = Color3.new(1, 1, 1)
-RerollTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-RerollTitle.Parent = RerollFrame
-
--- Bouton pour effectuer le Reroll
+-- Section pour activer le Trait Reroll
 local RerollButton = Instance.new("TextButton")
 RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0.5, -100, 0, 40)
-RerollButton.Text = "Effectuer Reroll"
+RerollButton.Position = UDim2.new(0, 100, 0, 120)
+RerollButton.Text = "Reroll Trait"
 RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-RerollButton.Parent = RerollFrame
+RerollButton.TextColor3 = Color3.new(1, 1, 1)
+RerollButton.Parent = MainFrame
 
--- Checkbox pour activer le rollback
+RerollButton.MouseButton1Click:Connect(performReroll)
+
+-- Checkbox pour activer/désactiver le Rollback
 local RollbackCheckbox = Instance.new("TextButton")
-RollbackCheckbox.Size = UDim2.new(0, 20, 0, 20)
-RollbackCheckbox.Position = UDim2.new(0.5, -60, 0, 100)
-RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-RollbackCheckbox.Text = ""
-RollbackCheckbox.Parent = RerollFrame
+RollbackCheckbox.Size = UDim2.new(0, 200, 0, 50)
+RollbackCheckbox.Position = UDim2.new(0, 100, 0, 180)
+RollbackCheckbox.Text = "Enable Rollback"
+RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+RollbackCheckbox.TextColor3 = Color3.new(1, 1, 1)
+RollbackCheckbox.Parent = MainFrame
 
--- Label pour la checkbox de rollback
-local RollbackLabel = Instance.new("TextLabel")
-RollbackLabel.Size = UDim2.new(0, 160, 0, 20)
-RollbackLabel.Position = UDim2.new(0.5, -30, 0, 100)
-RollbackLabel.Text = "Activer Rollback"
-RollbackLabel.TextScaled = true
-RollbackLabel.TextColor3 = Color3.new(1, 1, 1)
-RollbackLabel.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-RollbackLabel.Parent = RerollFrame
-
--- Action lorsque le bouton Auto Farm est cliqué
-AutoFarmButton.MouseButton1Click:Connect(function()
-    toggleAutoFarm()
-    AutoFarmButton.Text = isAutoFarming and "Désactiver Auto Farm" or "Activer Auto Farm"
-end)
-
--- Action lorsque le bouton Reroll est cliqué
-RerollButton.MouseButton1Click:Connect(function()
-    performReroll()
-end)
-
--- Action pour cocher ou décocher la checkbox de rollback
 RollbackCheckbox.MouseButton1Click:Connect(function()
     rollbackEnabled = not rollbackEnabled
-    RollbackCheckbox.BackgroundColor3 = rollbackEnabled and Color3.fromRGB(0, 255, 0) or Color3.fromRGB(255, 255, 255)
-    print("Rollback activé: ", rollbackEnabled)
+    if rollbackEnabled then
+        RollbackCheckbox.Text = "Rollback Enabled"
+        RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
+    else
+        RollbackCheckbox.Text = "Enable Rollback"
+        RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
+    end
 end)
 
--- Affiche le trait actuel au démarrage
-print("Trait actuel : " .. currentTrait)
-print("Ressources actuelles : " .. playerResources)
+-- Section pour Rejoin Server
+local RejoinButton = Instance.new("TextButton")
+RejoinButton.Size = UDim2.new(0, 200, 0, 50)
+RejoinButton.Position = UDim2.new(0, 100, 0, 240)
+RejoinButton.Text = "Rejoin Server"
+RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+RejoinButton.TextColor3 = Color3.new(1, 1, 1)
+RejoinButton.Parent = MainFrame
+
+RejoinButton.MouseButton1Click:Connect(rejoinServer)
+
+-- Activation de l'Anti-AFK dès le lancement
+antiAfk()
