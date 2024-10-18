@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local LocalPlayer = Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
 -- Main GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -10,31 +11,31 @@ ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 -- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 500, 0, 600) -- Adjusted for better layout
+MainFrame.Size = UDim2.new(0, 500, 0, 600)
 MainFrame.Position = UDim2.new(0.5, -250, 0.5, -300)
-MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 MainFrame.BorderSizePixel = 0
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Main Title
+-- Title
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 60)
 Title.Position = UDim2.new(0, 0, 0, 0)
-Title.Text = "Anime Defenders - TeamZ Hub" -- Updated title
+Title.Text = "Anime Defenders - TeamZ Hub"
 Title.TextScaled = true
 Title.TextColor3 = Color3.new(1, 1, 1)
-Title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Title.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 Title.Font = Enum.Font.SourceSansBold
 Title.TextStrokeTransparency = 0.5
 Title.Parent = MainFrame
 
 -- Categories Frame
 local CategoryFrame = Instance.new("Frame")
-CategoryFrame.Size = UDim2.new(0, 160, 0, 520) -- Adjusted for better spacing
+CategoryFrame.Size = UDim2.new(0, 160, 0, 520)
 CategoryFrame.Position = UDim2.new(0, 10, 0, 70)
-CategoryFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CategoryFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 CategoryFrame.BorderSizePixel = 0
 CategoryFrame.Parent = MainFrame
 
@@ -43,26 +44,26 @@ CategoryTitle.Size = UDim2.new(1, 0, 0, 40)
 CategoryTitle.Text = "Categories"
 CategoryTitle.TextScaled = true
 CategoryTitle.TextColor3 = Color3.new(1, 1, 1)
-CategoryTitle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+CategoryTitle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 CategoryTitle.Font = Enum.Font.SourceSansBold
 CategoryTitle.Parent = CategoryFrame
 
--- Function to create buttons with rounded corners
+-- Function to create buttons with hover effects
 local function createCategoryButton(text, positionY)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 150, 0, 50)
     button.Position = UDim2.new(0, 5, 0, positionY)
     button.Text = text
-    button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+    button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     button.TextColor3 = Color3.new(1, 1, 1)
     button.Font = Enum.Font.SourceSans
     button.TextScaled = true
     button.AutoButtonColor = false
     button.MouseEnter:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(90, 90, 90)
+        button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     end)
     button.MouseLeave:Connect(function()
-        button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
     end)
     button.Parent = CategoryFrame
     return button
@@ -70,13 +71,13 @@ end
 
 local RollbackButton = createCategoryButton("Rollback", 50)
 local AutoFarmButton = createCategoryButton("AutoFarm", 110)
-local LobbyButton = createCategoryButton("Lobby", 170) -- New Lobby category
+local LobbyButton = createCategoryButton("Lobby", 170)
 
 -- Rollback Frame
 local RollbackFrame = Instance.new("Frame")
 RollbackFrame.Size = UDim2.new(0, 300, 0, 400)
 RollbackFrame.Position = UDim2.new(0, 180, 0, 70)
-RollbackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+RollbackFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 RollbackFrame.Visible = false
 RollbackFrame.Parent = MainFrame
 
@@ -86,11 +87,11 @@ RollbackTitle.Size = UDim2.new(1, 0, 0, 60)
 RollbackTitle.Text = "Rollback Options"
 RollbackTitle.TextScaled = true
 RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
-RollbackTitle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+RollbackTitle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 RollbackTitle.Font = Enum.Font.SourceSansBold
 RollbackTitle.Parent = RollbackFrame
 
--- Rollback Options
+-- Rollback Buttons
 local function createActionButton(text, positionY)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 240, 0, 50)
@@ -107,11 +108,11 @@ end
 local EnableRollback = createActionButton("Activate Rollback", 70)
 local RejoinButton = createActionButton("Rejoin Server", 140)
 
--- Infinite Jump Checkbox
+-- Infinite Jump Frame
 local InfiniteJumpFrame = Instance.new("Frame")
 InfiniteJumpFrame.Size = UDim2.new(0, 300, 0, 100)
 InfiniteJumpFrame.Position = UDim2.new(0, 180, 0, 400)
-InfiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+InfiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 InfiniteJumpFrame.Visible = false
 InfiniteJumpFrame.Parent = MainFrame
 
@@ -120,7 +121,7 @@ InfiniteJumpLabel.Size = UDim2.new(1, 0, 0, 40)
 InfiniteJumpLabel.Text = "Infinite Jump"
 InfiniteJumpLabel.TextScaled = true
 InfiniteJumpLabel.TextColor3 = Color3.new(1, 1, 1)
-InfiniteJumpLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+InfiniteJumpLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 InfiniteJumpLabel.Font = Enum.Font.SourceSansBold
 InfiniteJumpLabel.Parent = InfiniteJumpFrame
 
@@ -140,11 +141,11 @@ InfiniteJumpToggle.MouseButton1Click:Connect(function()
     InfiniteJumpToggle.Text = infiniteJumpEnabled and "Infinite Jump: ON" or "Infinite Jump: OFF"
 end)
 
--- Speed Slider
+-- Speed Adjustment Frame
 local SpeedFrame = Instance.new("Frame")
 SpeedFrame.Size = UDim2.new(0, 300, 0, 200)
 SpeedFrame.Position = UDim2.new(0, 180, 0, 510)
-SpeedFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 SpeedFrame.Visible = false
 SpeedFrame.Parent = MainFrame
 
@@ -153,7 +154,7 @@ SpeedLabel.Size = UDim2.new(1, 0, 0, 40)
 SpeedLabel.Text = "Adjust Speed"
 SpeedLabel.TextScaled = true
 SpeedLabel.TextColor3 = Color3.new(1, 1, 1)
-SpeedLabel.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 SpeedLabel.Font = Enum.Font.SourceSansBold
 SpeedLabel.Parent = SpeedFrame
 
@@ -161,20 +162,22 @@ local SpeedSlider = Instance.new("TextButton")
 SpeedSlider.Size = UDim2.new(1, 0, 0, 40)
 SpeedSlider.Position = UDim2.new(0, 0, 0, 50)
 SpeedSlider.Text = "Drag to adjust speed (max 200)"
-SpeedSlider.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
 SpeedSlider.TextColor3 = Color3.new(1, 1, 1)
 SpeedSlider.Font = Enum.Font.SourceSans
 SpeedSlider.Parent = SpeedFrame
 
--- Update player speed when slider value changes
-local minSpeed = 16 -- Default walking speed
+-- Update player speed
+local minSpeed = 16
 local maxSpeed = 200
+local speedValue = minSpeed
+
 SpeedSlider.MouseButton1Down:Connect(function()
     local startPos = UserInputService:GetMouse().X
 
     local function onDrag()
         local mousePos = UserInputService:GetMouse().X
-        local speedValue = math.clamp(math.floor((mousePos - startPos) / 2) + minSpeed, minSpeed, maxSpeed)
+        speedValue = math.clamp(math.floor((mousePos - startPos) / 2) + minSpeed, minSpeed, maxSpeed)
         LocalPlayer.Character.Humanoid.WalkSpeed = speedValue
         SpeedSlider.Text = "Speed: " .. speedValue
     end
@@ -186,15 +189,13 @@ SpeedSlider.MouseButton1Down:Connect(function()
     end)
 end)
 
--- Placeholder for player traits
+-- Rollback Logic
 local playerTraits = {}
 
--- Function to save current traits
 local function saveTraits()
     -- Save traits to playerTraits here
 end
 
--- Function to restore traits
 local function restoreTraits()
     -- Restore traits from playerTraits here
 end
@@ -202,7 +203,9 @@ end
 -- Rollback and Rejoin logic
 EnableRollback.MouseButton1Click:Connect(function()
     print("Rollback activated!")
-    traitReroll()
+    saveTraits()
+    -- Logic for rollback
+    restoreTraits()
 end)
 
 RejoinButton.MouseButton1Click:Connect(function()
@@ -236,7 +239,7 @@ LocalPlayer.Idled:Connect(function()
 end)
 
 -- Infinite Jump Functionality
-game:GetService("RunService").RenderStepped:Connect(function()
+RunService.RenderStepped:Connect(function()
     if infiniteJumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
         LocalPlayer.Character.Humanoid.Jump = true
     end
