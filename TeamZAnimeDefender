@@ -1,23 +1,23 @@
--- Services utilisés
+-- Services used
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local UserInputService = game:GetService("UserInputService")
 local LocalPlayer = Players.LocalPlayer
 
--- GUI principal
+-- Main GUI
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Fenêtre principale
+-- Main Frame
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 500)
+MainFrame.Size = UDim2.new(0, 400, 0, 500) -- Adjusted for mobile and PC
 MainFrame.Position = UDim2.new(0.5, -200, 0.5, -250)
 MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Titre principal
+-- Main Title
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 60)
 Title.Position = UDim2.new(0, 0, 0, 0)
@@ -27,7 +27,7 @@ Title.TextColor3 = Color3.new(1, 1, 1)
 Title.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 Title.Parent = MainFrame
 
--- Catégories
+-- Categories
 local CategoryFrame = Instance.new("Frame")
 CategoryFrame.Size = UDim2.new(0, 160, 0, 400)
 CategoryFrame.Position = UDim2.new(0, 10, 0, 70)
@@ -36,13 +36,13 @@ CategoryFrame.Parent = MainFrame
 
 local CategoryTitle = Instance.new("TextLabel")
 CategoryTitle.Size = UDim2.new(1, 0, 0, 40)
-CategoryTitle.Text = "Catégories"
+CategoryTitle.Text = "Categories"
 CategoryTitle.TextScaled = true
 CategoryTitle.TextColor3 = Color3.new(1, 1, 1)
 CategoryTitle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
 CategoryTitle.Parent = CategoryFrame
 
--- Fonction pour créer des boutons
+-- Function to create buttons
 local function createCategoryButton(text, positionY)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 150, 0, 50)
@@ -59,7 +59,7 @@ end
 local RollbackButton = createCategoryButton("Rollback", 50)
 local AutoFarmButton = createCategoryButton("AutoFarm", 110)
 
--- Frame de Rollback
+-- Rollback Frame
 local RollbackFrame = Instance.new("Frame")
 RollbackFrame.Size = UDim2.new(0, 250, 0, 320)
 RollbackFrame.Position = UDim2.new(0, 180, 0, 70)
@@ -67,7 +67,7 @@ RollbackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
 RollbackFrame.Visible = false
 RollbackFrame.Parent = MainFrame
 
--- Titre Rollback
+-- Rollback Title
 local RollbackTitle = Instance.new("TextLabel")
 RollbackTitle.Size = UDim2.new(1, 0, 0, 60)
 RollbackTitle.Text = "Trait Rollback"
@@ -76,7 +76,7 @@ RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
 RollbackTitle.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 RollbackTitle.Parent = RollbackFrame
 
--- Options Rollback
+-- Rollback Options
 local function createActionButton(text, positionY)
     local button = Instance.new("TextButton")
     button.Size = UDim2.new(0, 220, 0, 50)
@@ -90,31 +90,31 @@ local function createActionButton(text, positionY)
     return button
 end
 
-local EnableRollback = createActionButton("Activer Rollback", 70)
-local RejoinButton = createActionButton("Rejoindre le serveur", 140)
+local EnableRollback = createActionButton("Activate Rollback", 70)
+local RejoinButton = createActionButton("Rejoin Server", 140)
 
--- Fonction pour afficher les catégories
+-- Function to display categories
 RollbackButton.MouseButton1Click:Connect(function()
     RollbackFrame.Visible = true
 end)
 
 AutoFarmButton.MouseButton1Click:Connect(function()
-    -- Ajouter les fonctionnalités d'AutoFarm ici
+    -- Add AutoFarm functionalities here
 end)
 
--- Fonctionnalité de Rollback
+-- Rollback functionality
 EnableRollback.MouseButton1Click:Connect(function()
-    print("Rollback activé !")
-    -- Appel de la fonction pour Rollback (simulation ici)
+    print("Rollback activated!")
+    -- Call the function for rollback (simulation here)
     traitReroll()
 end)
 
 RejoinButton.MouseButton1Click:Connect(function()
-    print("Rejoindre le serveur...")
+    print("Rejoining server...")
     TeleportService:Teleport(game.PlaceId)
 end)
 
--- Fonction anti-AFK
+-- Anti-AFK function
 local VirtualUser = game:GetService("VirtualUser")
 LocalPlayer.Idled:Connect(function()
     VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
@@ -122,12 +122,12 @@ LocalPlayer.Idled:Connect(function()
     VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
 end)
 
--- Fonction de Trait Reroll avec rollback
+-- Trait Reroll function with rollback
 function traitReroll()
     local rerollsUsed = 0
     local passiveObtained = false
 
-    -- Boucle de reroll
+    -- Reroll loop
     while not passiveObtained and rerollsUsed < 5 do
         rerollsUsed = rerollsUsed + 1
         passiveObtained = (math.random(1, 10) == 1)
@@ -135,13 +135,13 @@ function traitReroll()
     end
 
     if not passiveObtained then
-        print("Rollback en cours...")
+        print("Rolling back...")
         LocalPlayer:Kick("Rejoining to rollback...")
         wait(5)
         TeleportService:Teleport(game.PlaceId)
     else
-        print("Trait obtenu !")
+        print("Trait obtained!")
     end
 end
 
--- LAG Options / Hitbox adjustments (Placeholder pour le moment)
+-- LAG Options / Hitbox adjustments (Placeholder for now)
