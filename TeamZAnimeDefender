@@ -1,167 +1,147 @@
--- Services Roblox
+-- Services utilisés
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
-local RunService = game:GetService("RunService")
-local VirtualUser = game:GetService("VirtualUser") -- Utilisé pour simuler l'activité du joueur
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
 
--- Variables du joueur et de son personnage
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local traits = {"Trait1", "Trait2", "Trait3", "Trait4", "Trait5"} -- Liste des traits possibles
-local playerResources = 10 -- Ressources que le joueur a pour reroll
-local currentTrait = "Trait1" -- Trait actuel du joueur
-local previousTrait = currentTrait -- Pour le rollback
-local isAutoFarming = false -- Etat pour savoir si le joueur est en mode combat automatique
-local rollbackEnabled = false -- Checkbox pour activer ou désactiver le rollback
-local antiAfkEnabled = true -- Etat pour activer/désactiver l'anti-AFK
-
--- Fonction pour effectuer le reroll
-local function performReroll()
-    if playerResources <= 0 then
-        print("Pas assez de ressources pour effectuer un reroll.")
-        return
-    end
-    
-    -- Sauvegarde le trait actuel pour rollback
-    previousTrait = currentTrait
-    
-    -- Reroll (choix aléatoire d'un nouveau trait)
-    local newTrait = traits[math.random(1, #traits)]
-    
-    -- Met à jour le trait actuel
-    currentTrait = newTrait
-    
-    print("Nouveau trait obtenu : " .. currentTrait)
-    playerResources = playerResources - 1 -- Déduit une ressource pour le reroll
-
-    -- Si rollback est activé, on restaure le trait précédent si le joueur n'aime pas le nouveau
-    if rollbackEnabled then
-        rollback()
-    end
-end
-
--- Fonction pour effectuer le rollback
-local function rollback()
-    if previousTrait then
-        print("Rollback au trait précédent : " .. previousTrait)
-        currentTrait = previousTrait
-    else
-        print("Aucun trait précédent à restaurer.")
-    end
-end
-
--- Fonction pour activer ou désactiver le combat automatique
-local function toggleAutoFarm()
-    isAutoFarming = not isAutoFarming
-    if isAutoFarming then
-        print("Combat automatique activé.")
-        -- Simule le gain de ressources via le combat automatique
-        RunService.Heartbeat:Connect(function()
-            if isAutoFarming then
-                wait(5) -- Gagne des ressources toutes les 5 secondes
-                playerResources = playerResources + 1
-                print("Ressources gagnées: " .. playerResources)
-            end
-        end)
-    else
-        print("Combat automatique désactivé.")
-    end
-end
-
--- Fonction pour rejoindre un nouveau serveur
-local function rejoinServer()
-    print("Rejoining server...")
-    TeleportService:Teleport(game.PlaceId) -- Téléporte vers un nouveau serveur avec le même PlaceId
-end
-
--- Fonction Anti-AFK
-local function antiAfk()
-    if antiAfkEnabled then
-        player.Idled:Connect(function()
-            VirtualUser:CaptureController()
-            VirtualUser:ClickButton2(Vector2.new()) -- Simule un clic droit pour éviter l'inactivité
-            print("Anti-AFK déclenché.")
-        end)
-    end
-end
-
--- Interface utilisateur (GUI)
+-- GUI principal
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = player:WaitForChild("PlayerGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
--- Grande frame principale
+-- Fenêtre principale
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 400, 0, 400) -- Agrandi pour inclure la nouvelle section
-MainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-MainFrame.BorderSizePixel = 3
-MainFrame.BorderColor3 = Color3.fromRGB(255, 0, 0) -- Bordures rouges
+MainFrame.Size = UDim2.new(0, 400, 0, 300)
+MainFrame.Position = UDim2.new(0.5, -200, 0.3, -150)
+MainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 MainFrame.Parent = ScreenGui
 MainFrame.Active = true
 MainFrame.Draggable = true
 
--- Titre
+-- Titre principal
 local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(0, 400, 0, 50)
+Title.Size = UDim2.new(1, 0, 0, 50)
 Title.Position = UDim2.new(0, 0, 0, 0)
-Title.Text = "Game Menu"
+Title.Text = "Anime Defenders - Custom Script Hub"
 Title.TextScaled = true
 Title.TextColor3 = Color3.new(1, 1, 1)
 Title.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 Title.Parent = MainFrame
 
--- Section pour activer Auto Farm
+-- Catégories (Rollback, AutoFarm, etc.)
+local CategoryFrame = Instance.new("Frame")
+CategoryFrame.Size = UDim2.new(0, 150, 0, 250)
+CategoryFrame.Position = UDim2.new(0, 0, 0, 50)
+CategoryFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+CategoryFrame.Parent = MainFrame
+
+local CategoryTitle = Instance.new("TextLabel")
+CategoryTitle.Size = UDim2.new(1, 0, 0, 30)
+CategoryTitle.Text = "Categories"
+CategoryTitle.TextScaled = true
+CategoryTitle.TextColor3 = Color3.new(1, 1, 1)
+CategoryTitle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+CategoryTitle.Parent = CategoryFrame
+
+-- Boutons de catégories
+local RollbackButton = Instance.new("TextButton")
+RollbackButton.Size = UDim2.new(0, 140, 0, 50)
+RollbackButton.Position = UDim2.new(0, 5, 0, 40)
+RollbackButton.Text = "Rollback"
+RollbackButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+RollbackButton.TextColor3 = Color3.new(1, 1, 1)
+RollbackButton.Parent = CategoryFrame
+
 local AutoFarmButton = Instance.new("TextButton")
-AutoFarmButton.Size = UDim2.new(0, 200, 0, 50)
-AutoFarmButton.Position = UDim2.new(0, 100, 0, 60)
-AutoFarmButton.Text = "Toggle Auto Farm"
-AutoFarmButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+AutoFarmButton.Size = UDim2.new(0, 140, 0, 50)
+AutoFarmButton.Position = UDim2.new(0, 5, 0, 100)
+AutoFarmButton.Text = "AutoFarm"
+AutoFarmButton.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
 AutoFarmButton.TextColor3 = Color3.new(1, 1, 1)
-AutoFarmButton.Parent = MainFrame
+AutoFarmButton.Parent = CategoryFrame
 
-AutoFarmButton.MouseButton1Click:Connect(toggleAutoFarm)
+-- Frame de Rollback
+local RollbackFrame = Instance.new("Frame")
+RollbackFrame.Size = UDim2.new(0, 230, 0, 250)
+RollbackFrame.Position = UDim2.new(0, 160, 0, 50)
+RollbackFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+RollbackFrame.Visible = false
+RollbackFrame.Parent = MainFrame
 
--- Section pour activer le Trait Reroll
-local RerollButton = Instance.new("TextButton")
-RerollButton.Size = UDim2.new(0, 200, 0, 50)
-RerollButton.Position = UDim2.new(0, 100, 0, 120)
-RerollButton.Text = "Reroll Trait"
-RerollButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
-RerollButton.TextColor3 = Color3.new(1, 1, 1)
-RerollButton.Parent = MainFrame
+-- Titre Rollback
+local RollbackTitle = Instance.new("TextLabel")
+RollbackTitle.Size = UDim2.new(1, 0, 0, 50)
+RollbackTitle.Text = "Trait Rollback"
+RollbackTitle.TextScaled = true
+RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
+RollbackTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+RollbackTitle.Parent = RollbackFrame
 
-RerollButton.MouseButton1Click:Connect(performReroll)
+-- Options Rollback
+local EnableRollback = Instance.new("TextButton")
+EnableRollback.Size = UDim2.new(0, 200, 0, 50)
+EnableRollback.Position = UDim2.new(0.5, -100, 0, 60)
+EnableRollback.Text = "Activate Rollback"
+EnableRollback.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+EnableRollback.TextColor3 = Color3.new(1, 1, 1)
+EnableRollback.Parent = RollbackFrame
 
--- Checkbox pour activer/désactiver le Rollback
-local RollbackCheckbox = Instance.new("TextButton")
-RollbackCheckbox.Size = UDim2.new(0, 200, 0, 50)
-RollbackCheckbox.Position = UDim2.new(0, 100, 0, 180)
-RollbackCheckbox.Text = "Enable Rollback"
-RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-RollbackCheckbox.TextColor3 = Color3.new(1, 1, 1)
-RollbackCheckbox.Parent = MainFrame
-
-RollbackCheckbox.MouseButton1Click:Connect(function()
-    rollbackEnabled = not rollbackEnabled
-    if rollbackEnabled then
-        RollbackCheckbox.Text = "Rollback Enabled"
-        RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
-    else
-        RollbackCheckbox.Text = "Enable Rollback"
-        RollbackCheckbox.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
-    end
-end)
-
--- Section pour Rejoin Server
 local RejoinButton = Instance.new("TextButton")
 RejoinButton.Size = UDim2.new(0, 200, 0, 50)
-RejoinButton.Position = UDim2.new(0, 100, 0, 240)
+RejoinButton.Position = UDim2.new(0.5, -100, 0, 130)
 RejoinButton.Text = "Rejoin Server"
-RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+RejoinButton.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
 RejoinButton.TextColor3 = Color3.new(1, 1, 1)
-RejoinButton.Parent = MainFrame
+RejoinButton.Parent = RollbackFrame
 
-RejoinButton.MouseButton1Click:Connect(rejoinServer)
+-- Fonctionnement de Rollback et Rejoin
+EnableRollback.MouseButton1Click:Connect(function()
+    print("Rollback activé!")
+    -- Appel de la fonction pour Rollback (simulation ici)
+    traitReroll()
+end)
 
--- Activation de l'Anti-AFK dès le lancement
-antiAfk()
+RejoinButton.MouseButton1Click:Connect(function()
+    print("Rejoining server...")
+    TeleportService:Teleport(game.PlaceId)
+end)
+
+-- Affichage des catégories
+RollbackButton.MouseButton1Click:Connect(function()
+    RollbackFrame.Visible = true
+end)
+
+AutoFarmButton.MouseButton1Click:Connect(function()
+    -- Ajout des fonctionnalités d'AutoFarm ici
+end)
+
+-- Fonction anti-AFK
+local VirtualUser = game:GetService("VirtualUser")
+LocalPlayer.Idled:Connect(function()
+    VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+    wait(1)
+    VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+end)
+
+-- Fonction de Trait Reroll avec rollback
+function traitReroll()
+    local rerollsUsed = 0
+    local passiveObtained = false
+
+    -- Boucle de reroll
+    while not passiveObtained and rerollsUsed < 5 do
+        rerollsUsed = rerollsUsed + 1
+        passiveObtained = (math.random(1, 10) == 1)
+        wait(2)
+    end
+
+    if not passiveObtained then
+        print("Rollback en cours...")
+        LocalPlayer:Kick("Rejoining to rollback...")
+        wait(5)
+        TeleportService:Teleport(game.PlaceId)
+    else
+        print("Trait obtenu!")
+    end
+end
+
+-- LAG Options / Hitbox adjustments (Placeholder pour le moment)
