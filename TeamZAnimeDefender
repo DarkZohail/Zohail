@@ -1,98 +1,164 @@
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+-- Interface creation (StarterGui > ScreenGui > MainFrame)
+local screenGui = Instance.new("ScreenGui")
+local mainFrame = Instance.new("Frame")
+local uiLayout = Instance.new("UIListLayout")
 
--- Main GUI
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+screenGui.Name = "GameUI"
+screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
 
--- Main Frame
-local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 600, 0, 400)
-MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.BorderSizePixel = 0
-MainFrame.Parent = ScreenGui
-MainFrame.Active = true
-MainFrame.Draggable = true
+mainFrame.Name = "MainFrame"
+mainFrame.Parent = screenGui
+mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+mainFrame.Size = UDim2.new(0, 400, 0, 400)
+mainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
 
--- Title Bar
-local TitleBar = Instance.new("Frame")
-TitleBar.Size = UDim2.new(1, 0, 0, 50)
-TitleBar.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-TitleBar.Parent = MainFrame
+uiLayout.Parent = mainFrame
+uiLayout.SortOrder = Enum.SortOrder.LayoutOrder
 
-local Title = Instance.new("TextLabel")
-Title.Size = UDim2.new(1, -40, 1, 0)
-Title.Position = UDim2.new(0, 20, 0, 0)
-Title.Text = "TeamZ Hub"
-Title.TextColor3 = Color3.new(1, 1, 1)
-Title.TextScaled = true
-Title.BackgroundTransparency = 1
-Title.Parent = TitleBar
-
--- Category List
-local CategoryFrame = Instance.new("Frame")
-CategoryFrame.Size = UDim2.new(0, 120, 1, -50)
-CategoryFrame.Position = UDim2.new(0, 0, 0, 50)
-CategoryFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-CategoryFrame.BorderSizePixel = 0
-CategoryFrame.Parent = MainFrame
-
--- Categories
-local categories = {"Game", "Lobby", "Teleport", "Summon", "Local Player", "Misc"}
-local icons = {"rbxassetid://icon_id1", "rbxassetid://icon_id2", "rbxassetid://icon_id3", "rbxassetid://icon_id4", "rbxassetid://icon_id5", "rbxassetid://icon_id6"}
-
-for i, category in ipairs(categories) do
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, 0, 0, 50)
-    Button.Position = UDim2.new(0, 0, 0, (i - 1) * 50)
-    Button.Text = category
-    Button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    Button.TextScaled = true
-    Button.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    Button.Parent = CategoryFrame
+-- Helper function to create text labels
+local function createLabel(text, parent)
+    local label = Instance.new("TextLabel")
+    label.Text = text
+    label.Size = UDim2.new(1, 0, 0, 40)
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 1
+    label.Parent = parent
 end
 
--- Content Area
-local ContentFrame = Instance.new("Frame")
-ContentFrame.Size = UDim2.new(1, -120, 1, -50)
-ContentFrame.Position = UDim2.new(0, 120, 0, 50)
-ContentFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-ContentFrame.BorderSizePixel = 0
-ContentFrame.Parent = MainFrame
+-- Helper function to create toggles
+local function createToggle(text, parent, callback)
+    local button = Instance.new("TextButton")
+    button.Text = text
+    button.Size = UDim2.new(1, 0, 0, 40)
+    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    button.TextColor3 = Color3.fromRGB(255, 255, 255)
+    button.Parent = parent
 
-local ContentTitle = Instance.new("TextLabel")
-ContentTitle.Size = UDim2.new(1, 0, 0, 50)
-ContentTitle.Position = UDim2.new(0, 0, 0, 0)
-ContentTitle.Text = "Game"
-ContentTitle.TextColor3 = Color3.new(1, 1, 1)
-ContentTitle.TextScaled = true
-ContentTitle.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-ContentTitle.Parent = ContentFrame
-
--- Example of Buttons in Content
-local function createButton(text, parent, position)
-    local Button = Instance.new("TextButton")
-    Button.Size = UDim2.new(1, -20, 0, 50)
-    Button.Position = UDim2.new(0.5, -120, 0, position)
-    Button.Text = text
-    Button.TextColor3 = Color3.new(1, 1, 1)
-    Button.TextScaled = true
-    Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-    Button.Parent = parent
+    local enabled = false
+    button.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        button.BackgroundColor3 = enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(45, 45, 45)
+        callback(enabled)
+    end)
 end
 
-createButton("Delete Map", ContentFrame, 60)
-createButton("Sell Units", ContentFrame, 120)
-createButton("Auto Skip Wave", ContentFrame, 180)
-createButton("Auto Upgrade Units", ContentFrame, 240)
+-- Helper function to create sliders
+local function createSlider(text, parent, minValue, maxValue, defaultValue, callback)
+    createLabel(text, parent)
+    local slider = Instance.new("TextBox")
+    slider.Text = tostring(defaultValue)
+    slider.Size = UDim2.new(1, 0, 0, 40)
+    slider.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    slider.TextColor3 = Color3.fromRGB(255, 255, 255)
+    slider.Parent = parent
 
--- UI Optimization for Mobile and PC
-MainFrame.Size = UDim2.new(0, 600, 0, 400)
-MainFrame.Position = UDim2.new(0.5, -300, 0.5, -200)
-MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-MainFrame.Parent = ScreenGui
-MainFrame.Active = true
-MainFrame.Draggable = true
+    slider.FocusLost:Connect(function()
+        local value = tonumber(slider.Text)
+        if value then
+            value = math.clamp(value, minValue, maxValue)
+            slider.Text = tostring(value)
+            callback(value)
+        end
+    end)
+end
 
--- Infinite Jump and Speed Slider code from before can be added here for Lobby functionality.
+-- Auto Upgrade Units
+createToggle("Auto Upgrade Units", mainFrame, function(enabled)
+    if enabled then
+        -- Auto Upgrade Functionality
+        spawn(function()
+            while enabled do
+                wait(5) -- Interval between checks
+                autoUpgradeUnits()
+            end
+        end)
+    end
+end)
+
+-- Auto Select Units [PC]
+createToggle("Auto Select Units [PC]", mainFrame, function(enabled)
+    if enabled then
+        -- Auto Select Units Functionality
+        spawn(function()
+            while enabled do
+                wait(1) -- Interval for selection
+                autoSelectUnits()
+            end
+        end)
+    end
+end)
+
+-- Slider for Auto Select Speed
+local selectUnitsSpeed = 1
+createSlider("Auto Select Units Speed", mainFrame, 0.1, 5, selectUnitsSpeed, function(value)
+    selectUnitsSpeed = value
+end)
+
+-- Slider for Auto Place Interval
+local placeUnitsInterval = 1
+createSlider("Auto Place Units Interval", mainFrame, 0.1, 5, placeUnitsInterval, function(value)
+    placeUnitsInterval = value
+end)
+
+-- Auto Equip Best Units
+createToggle("Auto Equip Best Units", mainFrame, function(enabled)
+    if enabled then
+        autoEquipBestUnits()
+    end
+end)
+
+-- Select Chapter (Dropdown)
+createLabel("Select Chapter", mainFrame)
+-- Placeholder for dropdown; in Roblox, you would need to use a UI library to create a dropdown menu.
+
+-- Friends Only Toggle
+createToggle("Friends Only", mainFrame, function(enabled)
+    -- Logic to set lobby to Friends Only
+end)
+
+-- Select Difficulty (Dropdown)
+createLabel("Select Difficulty", mainFrame)
+-- Placeholder for difficulty dropdown
+
+-- Auto Join Toggle
+createToggle("Auto Join", mainFrame, function(enabled)
+    if enabled then
+        -- Auto Join functionality
+        spawn(function()
+            wait(joinAfterSeconds)
+            autoJoinMatch()
+        end)
+    end
+end)
+
+-- Slider for Join After X Seconds
+local joinAfterSeconds = 10
+createSlider("Join After X Seconds", mainFrame, 5, 60, joinAfterSeconds, function(value)
+    joinAfterSeconds = value
+end)
+
+--[[ FUNCTIONS TO BE IMPLEMENTED BELOW ]]--
+
+-- Auto Upgrade Units Function
+function autoUpgradeUnits()
+    -- Logic to check currency and upgrade units
+    print("Upgrading units...")
+end
+
+-- Auto Select Units Function
+function autoSelectUnits()
+    -- Logic to auto-select the best units
+    print("Selecting units...")
+end
+
+-- Auto Equip Best Units Function
+function autoEquipBestUnits()
+    -- Logic to equip the best units from the player's inventory
+    print("Equipping best units...")
+end
+
+-- Auto Join Match Function
+function autoJoinMatch()
+    -- Logic to auto join match after X seconds
+    print("Joining match...")
+end
