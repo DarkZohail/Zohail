@@ -1,164 +1,222 @@
--- Interface creation (StarterGui > ScreenGui > MainFrame)
-local screenGui = Instance.new("ScreenGui")
-local mainFrame = Instance.new("Frame")
-local uiLayout = Instance.new("UIListLayout")
+-- Services used
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
-screenGui.Name = "GameUI"
-screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+-- Detect if it's a mobile device
+local isMobile = UserInputService.TouchEnabled
 
-mainFrame.Name = "MainFrame"
-mainFrame.Parent = screenGui
-mainFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-mainFrame.Size = UDim2.new(0, 400, 0, 400)
-mainFrame.Position = UDim2.new(0.5, -200, 0.5, -200)
+-- Main GUI
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
-uiLayout.Parent = mainFrame
-uiLayout.SortOrder = Enum.SortOrder.LayoutOrder
+-- Main Frame (Responsive for PC and Mobile)
+local MainFrame = Instance.new("Frame")
+MainFrame.Size = UDim2.new(0, isMobile and 350 or 500, 0, isMobile and 400 or 600)
+MainFrame.Position = UDim2.new(0.5, -MainFrame.Size.X.Offset / 2, 0.5, -MainFrame.Size.Y.Offset / 2)
+MainFrame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+MainFrame.BorderSizePixel = 0
+MainFrame.Parent = ScreenGui
+MainFrame.Active = true
+MainFrame.Draggable = true
 
--- Helper function to create text labels
-local function createLabel(text, parent)
-    local label = Instance.new("TextLabel")
-    label.Text = text
-    label.Size = UDim2.new(1, 0, 0, 40)
-    label.TextColor3 = Color3.fromRGB(255, 255, 255)
-    label.BackgroundTransparency = 1
-    label.Parent = parent
-end
+-- Title
+local Title = Instance.new("TextLabel")
+Title.Size = UDim2.new(1, 0, 0, isMobile and 40 or 60)
+Title.Position = UDim2.new(0, 0, 0, 0)
+Title.Text = "Anime Defenders - TeamZ Hub"
+Title.TextScaled = true
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextStrokeTransparency = 0.5
+Title.Parent = MainFrame
 
--- Helper function to create toggles
-local function createToggle(text, parent, callback)
+-- Categories Frame
+local CategoryFrame = Instance.new("Frame")
+CategoryFrame.Size = UDim2.new(0, isMobile and 120 or 160, 0, isMobile and 300 or 520)
+CategoryFrame.Position = UDim2.new(0, 10, 0, isMobile and 50 or 70)
+CategoryFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+CategoryFrame.BorderSizePixel = 0
+CategoryFrame.Parent = MainFrame
+
+local CategoryTitle = Instance.new("TextLabel")
+CategoryTitle.Size = UDim2.new(1, 0, 0, 40)
+CategoryTitle.Text = "Categories"
+CategoryTitle.TextScaled = true
+CategoryTitle.TextColor3 = Color3.new(1, 1, 1)
+CategoryTitle.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+CategoryTitle.Font = Enum.Font.SourceSansBold
+CategoryTitle.Parent = CategoryFrame
+
+-- Function to create buttons with hover effects
+local function createCategoryButton(text, positionY)
     local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, isMobile and 100 or 150, 0, isMobile and 40 or 50)
+    button.Position = UDim2.new(0, 5, 0, positionY)
     button.Text = text
-    button.Size = UDim2.new(1, 0, 0, 40)
-    button.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    button.TextColor3 = Color3.fromRGB(255, 255, 255)
-    button.Parent = parent
-
-    local enabled = false
-    button.MouseButton1Click:Connect(function()
-        enabled = not enabled
-        button.BackgroundColor3 = enabled and Color3.fromRGB(0, 200, 0) or Color3.fromRGB(45, 45, 45)
-        callback(enabled)
+    button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.SourceSans
+    button.TextScaled = true
+    button.AutoButtonColor = false
+    button.MouseEnter:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(100, 100, 100)
     end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+    end)
+    button.Parent = CategoryFrame
+    return button
 end
 
--- Helper function to create sliders
-local function createSlider(text, parent, minValue, maxValue, defaultValue, callback)
-    createLabel(text, parent)
-    local slider = Instance.new("TextBox")
-    slider.Text = tostring(defaultValue)
-    slider.Size = UDim2.new(1, 0, 0, 40)
-    slider.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-    slider.TextColor3 = Color3.fromRGB(255, 255, 255)
-    slider.Parent = parent
+local RollbackButton = createCategoryButton("Rollback", 50)
+local AutoFarmButton = createCategoryButton("AutoFarm", 110)
+local LobbyButton = createCategoryButton("Lobby", 170)
 
-    slider.FocusLost:Connect(function()
-        local value = tonumber(slider.Text)
-        if value then
-            value = math.clamp(value, minValue, maxValue)
-            slider.Text = tostring(value)
-            callback(value)
+-- Rollback Frame
+local RollbackFrame = Instance.new("Frame")
+RollbackFrame.Size = UDim2.new(0, isMobile and 250 or 300, 0, isMobile and 250 or 400)
+RollbackFrame.Position = UDim2.new(0, isMobile and 130 or 180, 0, isMobile and 50 or 70)
+RollbackFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+RollbackFrame.Visible = false
+RollbackFrame.Parent = MainFrame
+
+-- Rollback Title
+local RollbackTitle = Instance.new("TextLabel")
+RollbackTitle.Size = UDim2.new(1, 0, 0, 60)
+RollbackTitle.Text = "Rollback Options"
+RollbackTitle.TextScaled = true
+RollbackTitle.TextColor3 = Color3.new(1, 1, 1)
+RollbackTitle.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+RollbackTitle.Font = Enum.Font.SourceSansBold
+RollbackTitle.Parent = RollbackFrame
+
+-- Rollback Buttons
+local function createActionButton(text, positionY)
+    local button = Instance.new("TextButton")
+    button.Size = UDim2.new(0, 240, 0, isMobile and 40 or 50)
+    button.Position = UDim2.new(0.5, -120, 0, positionY)
+    button.Text = text
+    button.BackgroundColor3 = Color3.fromRGB(85, 170, 255)
+    button.TextColor3 = Color3.new(1, 1, 1)
+    button.Font = Enum.Font.SourceSansBold
+    button.TextScaled = true
+    button.Parent = RollbackFrame
+    return button
+end
+
+local EnableRollback = createActionButton("Activate Rollback", 70)
+local RejoinButton = createActionButton("Rejoin Server", 140)
+
+-- Infinite Jump Frame
+local InfiniteJumpFrame = Instance.new("Frame")
+InfiniteJumpFrame.Size = UDim2.new(0, isMobile and 250 or 300, 0, isMobile and 80 or 100)
+InfiniteJumpFrame.Position = UDim2.new(0, isMobile and 130 or 180, 0, 400)
+InfiniteJumpFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+InfiniteJumpFrame.Visible = false
+InfiniteJumpFrame.Parent = MainFrame
+
+local InfiniteJumpLabel = Instance.new("TextLabel")
+InfiniteJumpLabel.Size = UDim2.new(1, 0, 0, 40)
+InfiniteJumpLabel.Text = "Infinite Jump"
+InfiniteJumpLabel.TextScaled = true
+InfiniteJumpLabel.TextColor3 = Color3.new(1, 1, 1)
+InfiniteJumpLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+InfiniteJumpLabel.Font = Enum.Font.SourceSansBold
+InfiniteJumpLabel.Parent = InfiniteJumpFrame
+
+local InfiniteJumpToggle = Instance.new("TextButton")
+InfiniteJumpToggle.Size = UDim2.new(0, 220, 0, 40)
+InfiniteJumpToggle.Position = UDim2.new(0.5, -110, 0, 50)
+InfiniteJumpToggle.Text = "Toggle Infinite Jump"
+InfiniteJumpToggle.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
+InfiniteJumpToggle.TextColor3 = Color3.new(1, 1, 1)
+InfiniteJumpToggle.Font = Enum.Font.SourceSansBold
+InfiniteJumpToggle.Parent = InfiniteJumpFrame
+
+local infiniteJumpEnabled = false
+
+InfiniteJumpToggle.MouseButton1Click:Connect(function()
+    infiniteJumpEnabled = not infiniteJumpEnabled
+    InfiniteJumpToggle.Text = infiniteJumpEnabled and "Infinite Jump: ON" or "Infinite Jump: OFF"
+end)
+
+-- Speed Adjustment Frame
+local SpeedFrame = Instance.new("Frame")
+SpeedFrame.Size = UDim2.new(0, isMobile and 250 or 300, 0, isMobile and 160 or 200)
+SpeedFrame.Position = UDim2.new(0, isMobile and 130 or 180, 0, 510)
+SpeedFrame.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+SpeedFrame.Visible = false
+SpeedFrame.Parent = MainFrame
+
+local SpeedLabel = Instance.new("TextLabel")
+SpeedLabel.Size = UDim2.new(1, 0, 0, 40)
+SpeedLabel.Text = "Adjust Speed"
+SpeedLabel.TextScaled = true
+SpeedLabel.TextColor3 = Color3.new(1, 1, 1)
+SpeedLabel.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+SpeedLabel.Font = Enum.Font.SourceSansBold
+SpeedLabel.Parent = SpeedFrame
+
+local SpeedSlider = Instance.new("TextButton")
+SpeedSlider.Size = UDim2.new(1, 0, 0, 40)
+SpeedSlider.Position = UDim2.new(0, 0, 0, 50)
+SpeedSlider.Text = "Drag to adjust speed (max 200)"
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+SpeedSlider.TextColor3 = Color3.new(1, 1, 1)
+SpeedSlider.Font = Enum.Font.SourceSans
+SpeedSlider.Parent = SpeedFrame
+
+local speedValue = 16
+local maxSpeed = 200
+
+SpeedSlider.MouseButton1Down:Connect(function()
+    local mouse = LocalPlayer:GetMouse()
+    local connection
+    connection = mouse.Move:Connect(function()
+        local sliderPosition = math.clamp(mouse.X - SpeedSlider.AbsolutePosition.X, 0, SpeedSlider.AbsoluteSize.X)
+        speedValue = math.floor((sliderPosition / SpeedSlider.AbsoluteSize.X) * maxSpeed)
+        SpeedSlider.Text = "Speed: " .. tostring(speedValue)
+    end)
+
+    UserInputService.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            connection:Disconnect()
         end
     end)
+end)
+
+-- Category Button Functions
+RollbackButton.MouseButton1Click:Connect(function()
+    RollbackFrame.Visible = true
+    InfiniteJumpFrame.Visible = false
+    SpeedFrame.Visible = false
+end)
+
+AutoFarmButton.MouseButton1Click:Connect(function()
+    RollbackFrame.Visible = false
+    InfiniteJumpFrame.Visible = true
+    SpeedFrame.Visible = false
+end)
+
+LobbyButton.MouseButton1Click:Connect(function()
+    RollbackFrame.Visible = false
+    InfiniteJumpFrame.Visible = false
+    SpeedFrame.Visible = true
+end)
+
+-- Infinite Jump Function
+local function infiniteJump()
+    LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(Enum.HumanoidStateType.Jumping)
 end
 
--- Auto Upgrade Units
-createToggle("Auto Upgrade Units", mainFrame, function(enabled)
-    if enabled then
-        -- Auto Upgrade Functionality
-        spawn(function()
-            while enabled do
-                wait(5) -- Interval between checks
-                autoUpgradeUnits()
-            end
-        end)
+RunService.RenderStepped:Connect(function()
+    if infiniteJumpEnabled and LocalPlayer.Character and LocalPlayer.Character:FindFirstChildOfClass("Humanoid") then
+        if UserInputService:IsKeyDown(Enum.KeyCode.Space) or (isMobile and UserInputService.TouchEnabled) then
+            infiniteJump()
+        end
     end
 end)
-
--- Auto Select Units [PC]
-createToggle("Auto Select Units [PC]", mainFrame, function(enabled)
-    if enabled then
-        -- Auto Select Units Functionality
-        spawn(function()
-            while enabled do
-                wait(1) -- Interval for selection
-                autoSelectUnits()
-            end
-        end)
-    end
-end)
-
--- Slider for Auto Select Speed
-local selectUnitsSpeed = 1
-createSlider("Auto Select Units Speed", mainFrame, 0.1, 5, selectUnitsSpeed, function(value)
-    selectUnitsSpeed = value
-end)
-
--- Slider for Auto Place Interval
-local placeUnitsInterval = 1
-createSlider("Auto Place Units Interval", mainFrame, 0.1, 5, placeUnitsInterval, function(value)
-    placeUnitsInterval = value
-end)
-
--- Auto Equip Best Units
-createToggle("Auto Equip Best Units", mainFrame, function(enabled)
-    if enabled then
-        autoEquipBestUnits()
-    end
-end)
-
--- Select Chapter (Dropdown)
-createLabel("Select Chapter", mainFrame)
--- Placeholder for dropdown; in Roblox, you would need to use a UI library to create a dropdown menu.
-
--- Friends Only Toggle
-createToggle("Friends Only", mainFrame, function(enabled)
-    -- Logic to set lobby to Friends Only
-end)
-
--- Select Difficulty (Dropdown)
-createLabel("Select Difficulty", mainFrame)
--- Placeholder for difficulty dropdown
-
--- Auto Join Toggle
-createToggle("Auto Join", mainFrame, function(enabled)
-    if enabled then
-        -- Auto Join functionality
-        spawn(function()
-            wait(joinAfterSeconds)
-            autoJoinMatch()
-        end)
-    end
-end)
-
--- Slider for Join After X Seconds
-local joinAfterSeconds = 10
-createSlider("Join After X Seconds", mainFrame, 5, 60, joinAfterSeconds, function(value)
-    joinAfterSeconds = value
-end)
-
---[[ FUNCTIONS TO BE IMPLEMENTED BELOW ]]--
-
--- Auto Upgrade Units Function
-function autoUpgradeUnits()
-    -- Logic to check currency and upgrade units
-    print("Upgrading units...")
-end
-
--- Auto Select Units Function
-function autoSelectUnits()
-    -- Logic to auto-select the best units
-    print("Selecting units...")
-end
-
--- Auto Equip Best Units Function
-function autoEquipBestUnits()
-    -- Logic to equip the best units from the player's inventory
-    print("Equipping best units...")
-end
-
--- Auto Join Match Function
-function autoJoinMatch()
-    -- Logic to auto join match after X seconds
-    print("Joining match...")
-end
