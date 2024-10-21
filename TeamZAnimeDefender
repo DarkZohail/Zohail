@@ -163,11 +163,11 @@ SpeedLabel.Parent = SpeedFrame
 
 local SpeedSlider = Instance.new("TextButton")
 SpeedSlider.Size = UDim2.new(1, 0, 0, 40)
-SpeedSlider.Position = UDim2.new(0, 0, 0, 50)
-SpeedSlider.Text = "Drag to adjust speed (max 200)"
-SpeedSlider.BackgroundColor3 = Color3.fromRGB(80, 80, 80)
+SpeedSlider.Position = UDim2.new(0, 0, 0, 60)
+SpeedSlider.Text = "Speed: 16"
+SpeedSlider.BackgroundColor3 = Color3.fromRGB(85, 255, 85)
 SpeedSlider.TextColor3 = Color3.new(1, 1, 1)
-SpeedSlider.Font = Enum.Font.SourceSans
+SpeedSlider.Font = Enum.Font.SourceSansBold
 SpeedSlider.Parent = SpeedFrame
 
 local speedValue = 16
@@ -220,3 +220,5 @@ RunService.RenderStepped:Connect(function()
         end
     end
 end)
+
+-- Optimized for both mobile and PC
